@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Decorator Deluxe</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --panel-color: #2d2d2d;
+            --accent-color: #f1c40f;
+            --text-color: #ffffff;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            transition: all 0.5s ease;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        /* Slot Machine Styles */
+        .slot-machine {
+            background: var(--panel-color);
+            padding: 20px;
+            border-radius: 15px;
+            border: 4px solid var(--accent-color);
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .reel {
+            width: 80px;
+            height: 100px;
+            background: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #333;
+        }
+
+        /* Controls */
+        .controls {
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        button:active { transform: scale(0.95); }
+        button:disabled { background: #666; cursor: not-allowed; }
+
+        /* Shop Area */
+        .shop-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--panel-color);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .shop-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+
+        .shop-item.owned { border-color: var(--accent-color); }
+
+        .price-tag {
+            display: block;
+            font-size: 0.9rem;
+            margin: 10px 0;
+            color: var(--accent-color);
+        }
+
+        .msg {
+            height: 20px;
+            margin-top: 10px;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🎰 Decorator Slots</h1>
+        <div class="stats">Tokens: <span id="token-count">100</span></div>
+        <div id="status-msg" class="msg"></div>
+    </div>
+
+    <div class="slot-machine">
+        <div class="reel" id="reel1">🍒</div>
+        <div class="reel" id="reel2">🍒</div>
+        <div class="reel" id="reel3">🍒</div>
+    </div>
+
+    <div class="controls">
+        <button id="spin-btn" onclick="spin()">SPIN (10 Tkn)</button>
+    </div>
+
+    <div class="shop-container">
+        <h3>🎨 Theme Shop</h3>
+        <div class="shop-grid" id="shop-grid">
+            </div>
+    </div>
+
+    <script>
+        // --- Game State ---
+        let tokens = 100;
+        const symbols = ['🍒', '🍋', '🔔', '💎', '7️⃣'];
+        const inventory = ['Default'];
+        
+        const shopItems = [
+            { id: 'dark-mode', name: 'Midnight', price: 50, colors: { bg: '#000000', panel: '#1a1a1a', accent: '#e74c3c' } },
+            { id: 'forest', name: 'Forest', price: 150, colors: { bg: '#1b3022', panel: '#2c5e3f', accent: '#2ecc71' } },
+            { id: 'cyber', name: 'Cyberpunk', price: 300, colors: { bg: '#2b0035', panel: '#ff0055', accent: '#00fff2' } },
+            { id: 'gold', name: 'High Roller', price: 500, colors: { bg: '#2c3e50', panel: '#34495e', accent: '#f1c40f' } }
+        ];
+
+        // --- Core Logic ---
+        function updateUI() {
+            document.getElementById('token-count').innerText = tokens;
+            renderShop();
+        }
+
+        function spin() {
+            if (tokens < 10) {
+                document.getElementById('status-msg').innerText = "Not enough tokens!";
+                return;
+            }
+
+            tokens -= 10;
+            document.getElementById('status-msg').innerText = "Spinning...";
+            document.getElementById('spin-btn').disabled = true;
+
+            const reelElements = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+            
+            // "Animation" effect
+            let iterations = 0;
+            const interval = setInterval(() => {
+                reelElements.forEach(reel => {
+                    reel.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                });
+                iterations++;
+
+                if (iterations > 10) {
+                    clearInterval(interval);
+                    finalizeSpin(reelElements);
+                }
+            }, 100);
+        }
+
+        function finalizeSpin(reels) {
+            const results = reels.map(r => r.innerText);
+            document.getElementById('spin-btn').disabled = false;
+
+            if (results[0] === results[1] && results[1] === results[2]) {
+                const winAmount = 100;
+                tokens += winAmount;
+                document.getElementById('status-msg').innerText = `JACKPOT! +${winAmount} Tokens`;
+            } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+                const winAmount = 20;
+                tokens += winAmount;
+                document.getElementById('status-msg').innerText = `Small Win! +${winAmount} Tokens`;
+            } else {
+                document.getElementById('status-msg').innerText = "Try again!";
+            }
+            updateUI();
+        }
+
+        function renderShop() {
+            const grid = document.getElementById('shop-grid');
+            grid.innerHTML = '';
+
+            shopItems.forEach(item => {
+                const isOwned = inventory.includes(item.id);
+                const div = document.createElement('div');
+                div.className = `shop-item ${isOwned ? 'owned' : ''}`;
+                
+                div.innerHTML = `
+                    <strong>${item.name}</strong>
+                    <span class="price-tag">${isOwned ? 'OWNED' : item.price + ' Tkn'}</span>
+                    <button onclick="${isOwned ? `applyTheme('${item.id}')` : `buyItem('${item.id}')`}" 
+                            style="font-size: 0.8rem; padding: 5px 10px;">
+                        ${isOwned ? 'Apply' : 'Buy'}
+                    </button>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function buyItem(id) {
+            const item = shopItems.find(i => i.id === id);
+            if (tokens >= item.price) {
+                tokens -= item.price;
+                inventory.push(id);
+                document.getElementById('status-msg').innerText = `Purchased ${item.name}!`;
+                updateUI();
+            } else {
+                document.getElementById('status-msg').innerText = "Too expensive!";
+            }
+        }
+
+        function applyTheme(id) {
+            const item = shopItems.find(i => i.id === id);
+            if (!item) return;
+
+            document.documentElement.style.setProperty('--bg-color', item.colors.bg);
+            document.documentElement.style.setProperty('--panel-color', item.colors.panel);
+            document.documentElement.style.setProperty('--accent-color', item.colors.accent);
+            document.getElementById('status-msg').innerText = `${item.name} Theme Applied!`;
+        }
+
+        // Init
+        updateUI();
+    </script>
+</body>
+</html>
