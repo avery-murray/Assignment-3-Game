@@ -25,19 +25,16 @@
             transition: all 0.5s ease;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        .header { text-align: center; margin-bottom: 20px; }
 
         .stats {
             font-size: 1.5rem;
             font-weight: bold;
             color: var(--accent-color);
             margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* Slot Machine Styles */
         .slot-machine {
             background: var(--panel-color);
             padding: 20px;
@@ -59,66 +56,56 @@
             justify-content: center;
             font-size: 3rem;
             color: #333;
-        }
-
-        /* Controls */
-        .controls {
-            margin-bottom: 30px;
-        }
-
-        button {
-            padding: 12px 30px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            background: var(--accent-color);
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
             transition: transform 0.1s;
         }
 
-        button:active { transform: scale(0.95); }
-        button:disabled { background: #666; cursor: not-allowed; }
+        .controls { display: flex; gap: 10px; margin-bottom: 30px; }
 
-        /* Shop Area */
+        button {
+            padding: 12px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: transform 0.1s, opacity 0.3s;
+        }
+
+        button:hover { opacity: 0.9; }
+        button:active { transform: scale(0.95); }
+        button:disabled { background: #666; cursor: not-allowed; color: #ccc; }
+
         .shop-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
             background: var(--panel-color);
             padding: 20px;
             border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .shop-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
 
         .shop-item {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
             padding: 15px;
             border-radius: 10px;
             text-align: center;
-            border: 1px solid transparent;
+            border: 2px solid transparent;
         }
 
-        .shop-item.owned { border-color: var(--accent-color); }
+        .shop-item.owned { border-color: var(--accent-color); background: rgba(255,255,255,0.1); }
 
-        .price-tag {
-            display: block;
-            font-size: 0.9rem;
-            margin: 10px 0;
-            color: var(--accent-color);
-        }
+        .price-tag { display: block; font-size: 0.85rem; margin: 8px 0; color: var(--accent-color); }
 
-        .msg {
-            height: 20px;
-            margin-top: 10px;
-            color: var(--accent-color);
-            font-weight: bold;
-        }
+        .msg { height: 24px; margin-top: 10px; color: var(--accent-color); font-weight: bold; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -126,87 +113,108 @@
     <div class="header">
         <h1>🎰 Decorator Slots</h1>
         <div class="stats">Tokens: <span id="token-count">100</span></div>
-        <div id="status-msg" class="msg"></div>
+        <div id="status-msg" class="msg">Welcome! Good luck!</div>
     </div>
 
     <div class="slot-machine">
-        <div class="reel" id="reel1">🍒</div>
-        <div class="reel" id="reel2">🍒</div>
-        <div class="reel" id="reel3">🍒</div>
+        <div class="reel" id="reel1">💎</div>
+        <div class="reel" id="reel2">💎</div>
+        <div class="reel" id="reel3">💎</div>
     </div>
 
     <div class="controls">
-        <button id="spin-btn" onclick="spin()">SPIN (10 Tkn)</button>
+        <button class="spin-btn" onclick="spin(1)">Spin (10)</button>
+        <button class="spin-btn" onclick="spin(5)" style="background: #e67e22;">Spin x5 (50)</button>
     </div>
 
     <div class="shop-container">
         <h3>🎨 Theme Shop</h3>
-        <div class="shop-grid" id="shop-grid">
-            </div>
+        <div class="shop-grid" id="shop-grid"></div>
     </div>
 
     <script>
-        // --- Game State ---
         let tokens = 100;
-        const symbols = ['🍒', '🍋', '🔔', '💎', '7️⃣'];
-        const inventory = ['Default'];
+        const symbols = ['🍒', '🍋', '🔔', '💎', '7️⃣', '🍀'];
+        const inventory = ['default'];
         
         const shopItems = [
-            { id: 'dark-mode', name: 'Midnight', price: 50, colors: { bg: '#000000', panel: '#1a1a1a', accent: '#e74c3c' } },
-            { id: 'forest', name: 'Forest', price: 150, colors: { bg: '#1b3022', panel: '#2c5e3f', accent: '#2ecc71' } },
-            { id: 'cyber', name: 'Cyberpunk', price: 300, colors: { bg: '#2b0035', panel: '#ff0055', accent: '#00fff2' } },
-            { id: 'gold', name: 'High Roller', price: 500, colors: { bg: '#2c3e50', panel: '#34495e', accent: '#f1c40f' } }
+            { id: 'midnight', name: 'Midnight', price: 50, colors: { bg: '#0b0b0d', panel: '#1c1c1f', accent: '#e74c3c' } },
+            { id: 'forest', name: 'Forest', price: 120, colors: { bg: '#1b3022', panel: '#2c5e3f', accent: '#2ecc71' } },
+            { id: 'cyber', name: 'Cyberpunk', price: 250, colors: { bg: '#2b0035', panel: '#440055', accent: '#00fff2' } },
+            { id: 'ocean', name: 'Deep Sea', price: 400, colors: { bg: '#001a33', panel: '#003366', accent: '#33ccff' } },
+            { id: 'candy', name: 'Candy Land', price: 600, colors: { bg: '#ffafcc', panel: '#ffc8dd', accent: '#fb6f92' } },
+            { id: 'cosmic', name: 'Cosmic Gold', price: 1000, colors: { bg: '#14111a', panel: '#241d33', accent: '#f1c40f' } }
         ];
 
-        // --- Core Logic ---
         function updateUI() {
             document.getElementById('token-count').innerText = tokens;
             renderShop();
         }
 
-        function spin() {
-            if (tokens < 10) {
+        async function spin(count) {
+            const cost = 10 * count;
+            if (tokens < cost) {
                 document.getElementById('status-msg').innerText = "Not enough tokens!";
                 return;
             }
 
-            tokens -= 10;
-            document.getElementById('status-msg').innerText = "Spinning...";
-            document.getElementById('spin-btn').disabled = true;
+            tokens -= cost;
+            updateUI();
+            toggleButtons(true);
 
-            const reelElements = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
-            
-            // "Animation" effect
-            let iterations = 0;
-            const interval = setInterval(() => {
-                reelElements.forEach(reel => {
-                    reel.innerText = symbols[Math.floor(Math.random() * symbols.length)];
-                });
-                iterations++;
+            let totalWon = 0;
+            const status = document.getElementById('status-msg');
 
-                if (iterations > 10) {
-                    clearInterval(interval);
-                    finalizeSpin(reelElements);
+            // Animation and logic loop
+            for (let i = 0; i < count; i++) {
+                status.innerText = count > 1 ? `Spinning ${i + 1}/${count}...` : "Spinning...";
+                
+                // Visual roll
+                await animateReels(200 + (i * 50)); 
+                
+                // Calculate Result
+                const results = [
+                    symbols[Math.floor(Math.random() * symbols.length)],
+                    symbols[Math.floor(Math.random() * symbols.length)],
+                    symbols[Math.floor(Math.random() * symbols.length)]
+                ];
+
+                // Set final symbols
+                document.getElementById('reel1').innerText = results[0];
+                document.getElementById('reel2').innerText = results[1];
+                document.getElementById('reel3').innerText = results[2];
+
+                // Calculate Payout
+                if (results[0] === results[1] && results[1] === results[2]) {
+                    totalWon += 100;
+                } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+                    totalWon += 20;
                 }
-            }, 100);
+            }
+
+            tokens += totalWon;
+            status.innerText = totalWon > 0 ? `Total Won: ${totalWon} Tokens!` : "No luck this time!";
+            toggleButtons(false);
+            updateUI();
         }
 
-        function finalizeSpin(reels) {
-            const results = reels.map(r => r.innerText);
-            document.getElementById('spin-btn').disabled = false;
+        function animateReels(duration) {
+            return new Promise(resolve => {
+                const startTime = Date.now();
+                const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+                
+                const timer = setInterval(() => {
+                    reels.forEach(r => r.innerText = symbols[Math.floor(Math.random() * symbols.length)]);
+                    if (Date.now() - startTime >= duration) {
+                        clearInterval(timer);
+                        resolve();
+                    }
+                }, 50);
+            });
+        }
 
-            if (results[0] === results[1] && results[1] === results[2]) {
-                const winAmount = 100;
-                tokens += winAmount;
-                document.getElementById('status-msg').innerText = `JACKPOT! +${winAmount} Tokens`;
-            } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-                const winAmount = 20;
-                tokens += winAmount;
-                document.getElementById('status-msg').innerText = `Small Win! +${winAmount} Tokens`;
-            } else {
-                document.getElementById('status-msg').innerText = "Try again!";
-            }
-            updateUI();
+        function toggleButtons(disabled) {
+            document.querySelectorAll('.spin-btn').forEach(btn => btn.disabled = disabled);
         }
 
         function renderShop() {
@@ -222,7 +230,7 @@
                     <strong>${item.name}</strong>
                     <span class="price-tag">${isOwned ? 'OWNED' : item.price + ' Tkn'}</span>
                     <button onclick="${isOwned ? `applyTheme('${item.id}')` : `buyItem('${item.id}')`}" 
-                            style="font-size: 0.8rem; padding: 5px 10px;">
+                            style="font-size: 0.8rem; padding: 5px 10px; width: 100%;">
                         ${isOwned ? 'Apply' : 'Buy'}
                     </button>
                 `;
@@ -235,24 +243,21 @@
             if (tokens >= item.price) {
                 tokens -= item.price;
                 inventory.push(id);
-                document.getElementById('status-msg').innerText = `Purchased ${item.name}!`;
+                document.getElementById('status-msg').innerText = `Unlocked ${item.name}!`;
                 updateUI();
             } else {
-                document.getElementById('status-msg').innerText = "Too expensive!";
+                document.getElementById('status-msg').innerText = "Insufficient tokens!";
             }
         }
 
         function applyTheme(id) {
             const item = shopItems.find(i => i.id === id);
-            if (!item) return;
-
             document.documentElement.style.setProperty('--bg-color', item.colors.bg);
             document.documentElement.style.setProperty('--panel-color', item.colors.panel);
             document.documentElement.style.setProperty('--accent-color', item.colors.accent);
-            document.getElementById('status-msg').innerText = `${item.name} Theme Applied!`;
+            document.getElementById('status-msg').innerText = `${item.name} theme active!`;
         }
 
-        // Init
         updateUI();
     </script>
 </body>
