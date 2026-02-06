@@ -1,8 +1,8 @@
 # Assignment-3-Game
 
-This site is a Decorate Slot game in which you use tokens to spin a slot machiene with the goal of winning more tokens to purchace different themes.
+This site is a Decorate Slot game in which you use tokens to spin a slot machine with the goal of winning more tokens to purchace different themes.
 
-The player start with 100 tokens and can purchase spins for 10 coins each. With the winnings they can purchase and apply different themes to the game.
+The player start with 100 tokens and can purchase spins for 10 coins each. With the winnings, they can purchase and apply different themes to the game.
 
 If the player matches all three slots, a MEGA JACKPOT animation will appear to celebrate the win.
 
