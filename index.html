@@ -18,174 +18,217 @@
             color: var(--text-color);
             font-family: var(--font-family);
             display: flex;
-            flex-direction: row; /* Layout for side-game */
             justify-content: center;
-            align-items: flex-start;
+            align-items: stretch;
             margin: 0;
-            padding: 20px;
+            min-height: 100vh;
+            padding: 0;
             transition: all 0.5s ease;
-            gap: 40px;
+            overflow-x: hidden;
         }
 
-        .main-game {
+        /* Jackpot Overlay */
+        #jackpot-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s;
+        }
+
+        .jackpot-text {
+            font-size: 6rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 20px #fff, 0 0 40px var(--accent-color);
+            animation: bounce 0.5s infinite alternate;
+            margin: 0;
+        }
+
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.2); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .shake { animation: shake 0.5s infinite; }
+
+        /* Layout Container */
+        .game-wrapper {
+            display: flex;
+            width: 95%;
+            max-width: 1400px;
+            gap: 30px;
+            padding: 40px 0;
+        }
+
+        .side-game {
+            flex: 1;
+            background: var(--panel-color);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px dashed var(--accent-color);
+            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .header { text-align: center; margin-bottom: 20px; }
+        .main-game {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
         .stats {
-            font-size: 1.5rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: var(--accent-color);
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin: 15px 0;
         }
 
         .slot-machine {
             background: var(--panel-color);
-            padding: 20px;
-            border-radius: 15px;
-            border: 4px solid var(--accent-color);
+            padding: 40px;
+            border-radius: 25px;
+            border: 8px solid var(--accent-color);
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            gap: 25px;
+            margin-bottom: 30px;
+            position: relative;
         }
 
         .reel {
-            width: 80px;
-            height: 100px;
+            width: 140px;
+            height: 180px;
             background: #fff;
-            border-radius: 10px;
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            font-size: 5rem;
             color: #333;
-            transition: transform 0.1s;
         }
 
-        .controls { display: flex; gap: 10px; margin-bottom: 30px; }
+        .controls { display: flex; gap: 20px; margin-bottom: 20px; }
 
         button {
-            padding: 12px 20px;
-            font-size: 1rem;
+            padding: 15px 30px;
+            font-size: 1.1rem;
             cursor: pointer;
             background: var(--accent-color);
             color: #000;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             font-weight: bold;
-            transition: transform 0.1s, opacity 0.3s;
+            transition: all 0.2s;
         }
 
-        button:hover { opacity: 0.9; }
-        button:active { transform: scale(0.95); }
-        button:disabled { background: #666; cursor: not-allowed; color: #ccc; }
-
-        .shop-container {
-            width: 100%;
-            background: var(--panel-color);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        #gamble-btn {
+            background: #9b59b6;
+            color: white;
+            display: none;
+            animation: pulse 1s infinite;
         }
 
-        /* 3x2 Grid Implementation */
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
         .shop-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, auto);
-            gap: 15px;
-            margin-top: 15px;
+            gap: 20px;
+            margin-top: 20px;
         }
 
         .shop-item {
             background: rgba(255,255,255,0.05);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px solid transparent;
-        }
-
-        .shop-item.owned { border-color: var(--accent-color); background: rgba(255,255,255,0.1); }
-
-        .price-tag { display: block; font-size: 0.85rem; margin: 8px 0; color: var(--accent-color); }
-
-        .msg { height: 24px; margin-top: 10px; color: var(--accent-color); font-weight: bold; font-size: 1.1rem; }
-
-        /* Side Game Styles */
-        .side-game {
-            background: var(--panel-color);
             padding: 20px;
             border-radius: 15px;
-            border: 2px dashed var(--accent-color);
             text-align: center;
-            width: 180px;
-            position: sticky;
-            top: 20px;
         }
 
         #clicker-btn {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             background: radial-gradient(circle, #f1c40f, #d4af37);
-            border: 4px solid #b8860b;
-            font-size: 2.5rem;
+            border: 6px solid #b8860b;
+            font-size: 3.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 20px auto;
             cursor: pointer;
-            user-select: none;
-            box-shadow: 0 5px 0 #b8860b;
+            box-shadow: 0 8px 0 #b8860b;
         }
 
-        #clicker-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 1px 0 #b8860b;
-        }
+        #clicker-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #b8860b; }
+
+        .msg { height: 35px; margin-bottom: 10px; color: var(--accent-color); font-weight: bold; font-size: 1.4rem; }
     </style>
 </head>
-<body>
+<body id="game-body">
 
-    <div class="main-game">
-        <div class="header">
-            <h1>🎰 Decorator Slots</h1>
-            <div class="stats">Tokens: <span id="token-count">100</span></div>
-            <div id="status-msg" class="msg">Welcome! Good luck!</div>
-        </div>
-
-        <div class="slot-machine">
-            <div class="reel" id="reel1">💎</div>
-            <div class="reel" id="reel2">💎</div>
-            <div class="reel" id="reel3">💎</div>
-        </div>
-
-        <div class="controls">
-            <button class="spin-btn" onclick="spin(1)">Spin (10)</button>
-            <button class="spin-btn" onclick="spin(5)" style="background: #e67e22;">Spin x5 (50)</button>
-        </div>
-
-        <div class="shop-container">
-            <h3>🎨 Theme Shop (3x2)</h3>
-            <div class="shop-grid" id="shop-grid"></div>
-        </div>
+    <div id="jackpot-overlay" onclick="closeJackpot()">
+        <h1 class="jackpot-text">MEGA WIN!</h1>
+        <p style="font-size: 2rem;">+100 Tokens</p>
+        <p style="color: grey;">(Click to continue)</p>
     </div>
 
-    <div class="side-game">
-        <h3>💰 Token Miner</h3>
-        <p style="font-size: 0.8rem;">Need tokens? Click the coin!</p>
-        <div id="clicker-btn" onclick="mineToken()">🪙</div>
-        <p id="mine-msg" style="font-size: 0.8rem; color: var(--accent-color);">+1 per click</p>
+    <div class="game-wrapper">
+        <div class="side-game">
+            <h2>💰 Token Miner</h2>
+            <div id="clicker-btn" onclick="mineToken()">🪙</div>
+            <button id="buy-auto-btn" onclick="buyAutoMiner()" style="width: 100%; font-size: 0.8rem; background: #2ecc71;">
+                Buy Auto-Miner (500 Tkn)
+            </button>
+            <div id="auto-status" style="display:none; color: #2ecc71; margin-top: 10px;">⚡ Auto-Miner Active</div>
+            
+            <hr style="width:100%; margin: 20px 0; border: 1px solid #444;">
+            
+            <h3>🎲 Gamble Win</h3>
+            <p id="gamble-info" style="font-size: 0.8rem;">Win something first!</p>
+            <button id="gamble-btn" onclick="gambleWin()">DOUBLE OR NOTHING</button>
+        </div>
+
+        <div class="main-game">
+            <div class="header">
+                <h1>🎰 Decorator Slots</h1>
+                <div class="stats">Tokens: <span id="token-count">100</span></div>
+                <div id="status-msg" class="msg">Spin to start!</div>
+            </div>
+
+            <div id="slot-container" class="slot-machine">
+                <div class="reel" id="reel1">💎</div>
+                <div class="reel" id="reel2">💎</div>
+                <div class="reel" id="reel3">💎</div>
+            </div>
+
+            <div class="controls">
+                <button class="spin-btn" onclick="spin(1)">Spin (10)</button>
+                <button class="spin-btn" onclick="spin(5)" style="background: #e67e22;">Spin x5 (50)</button>
+            </div>
+
+            <div class="shop-container">
+                <h3 style="margin:0;">🎨 Theme Shop (3x2)</h3>
+                <div class="shop-grid" id="shop-grid"></div>
+            </div>
+        </div>
     </div>
 
     <script>
         let tokens = 100;
+        let lastWin = 0;
+        let hasAutoMiner = false;
         const symbols = ['🍒', '🍋', '🔔', '💎', '7️⃣', '🍀'];
         const inventory = ['default'];
         
@@ -198,8 +241,77 @@
             { id: 'cosmic', name: 'Cosmic Gold', price: 1000, colors: { bg: '#14111a', panel: '#241d33', accent: '#f1c40f' } }
         ];
 
-        function mineToken() {
-            tokens += 1;
+        function mineToken() { tokens += 1; updateUI(); }
+
+        function buyAutoMiner() {
+            if (tokens >= 500 && !hasAutoMiner) {
+                tokens -= 500; hasAutoMiner = true;
+                document.getElementById('buy-auto-btn').style.display = 'none';
+                document.getElementById('auto-status').style.display = 'block';
+                setInterval(() => { tokens += 5; updateUI(); }, 1000);
+            }
+        }
+
+        function gambleWin() {
+            const success = Math.random() > 0.5;
+            if (success) {
+                tokens += lastWin;
+                document.getElementById('status-msg').innerText = `DOUBLED! +${lastWin} more tokens!`;
+                lastWin *= 2;
+                document.getElementById('gamble-info').innerText = `Risking ${lastWin}?`;
+            } else {
+                tokens -= lastWin;
+                document.getElementById('status-msg').innerText = `LOST IT ALL!`;
+                lastWin = 0;
+                hideGamble();
+            }
+            updateUI();
+        }
+
+        function hideGamble() {
+            document.getElementById('gamble-btn').style.display = 'none';
+            document.getElementById('gamble-info').innerText = "Win something first!";
+        }
+
+        function closeJackpot() {
+            document.getElementById('jackpot-overlay').style.display = 'none';
+            document.getElementById('game-body').classList.remove('shake');
+        }
+
+        async function spin(count) {
+            const cost = 10 * count;
+            if (tokens < cost) return;
+            tokens -= cost;
+            lastWin = 0;
+            hideGamble();
+            updateUI();
+            toggleButtons(true);
+
+            let spinTotal = 0;
+            for (let i = 0; i < count; i++) {
+                await animateReels(150);
+                const res = [symbols[Math.floor(Math.random()*6)], symbols[Math.floor(Math.random()*6)], symbols[Math.floor(Math.random()*6)]];
+                document.getElementById('reel1').innerText = res[0];
+                document.getElementById('reel2').innerText = res[1];
+                document.getElementById('reel3').innerText = res[2];
+
+                if (res[0] === res[1] && res[1] === res[2]) {
+                    spinTotal += 100;
+                    document.getElementById('jackpot-overlay').style.display = 'flex';
+                    document.getElementById('game-body').classList.add('shake');
+                } else if (res[0] === res[1] || res[1] === res[2] || res[0] === res[2]) {
+                    spinTotal += 20;
+                }
+            }
+
+            if (spinTotal > 0) {
+                lastWin = spinTotal;
+                tokens += spinTotal;
+                document.getElementById('gamble-btn').style.display = 'block';
+                document.getElementById('gamble-info').innerText = `Risk ${lastWin} tokens?`;
+            }
+            document.getElementById('status-msg').innerText = spinTotal > 0 ? `Won ${spinTotal} Tokens!` : "Try again!";
+            toggleButtons(false);
             updateUI();
         }
 
@@ -208,97 +320,40 @@
             renderShop();
         }
 
-        async function spin(count) {
-            const cost = 10 * count;
-            if (tokens < cost) {
-                document.getElementById('status-msg').innerText = "Not enough tokens! Use the miner!";
-                return;
-            }
-
-            tokens -= cost;
-            updateUI();
-            toggleButtons(true);
-
-            let totalWon = 0;
-            const status = document.getElementById('status-msg');
-
-            for (let i = 0; i < count; i++) {
-                status.innerText = count > 1 ? `Spinning ${i + 1}/${count}...` : "Spinning...";
-                await animateReels(200 + (i * 50)); 
-                
-                const results = [
-                    symbols[Math.floor(Math.random() * symbols.length)],
-                    symbols[Math.floor(Math.random() * symbols.length)],
-                    symbols[Math.floor(Math.random() * symbols.length)]
-                ];
-
-                document.getElementById('reel1').innerText = results[0];
-                document.getElementById('reel2').innerText = results[1];
-                document.getElementById('reel3').innerText = results[2];
-
-                if (results[0] === results[1] && results[1] === results[2]) {
-                    totalWon += 100;
-                } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-                    totalWon += 20;
-                }
-            }
-
-            tokens += totalWon;
-            status.innerText = totalWon > 0 ? `Total Won: ${totalWon} Tokens!` : "No luck this time!";
-            toggleButtons(false);
-            updateUI();
-        }
-
-        function animateReels(duration) {
-            return new Promise(resolve => {
-                const startTime = Date.now();
+        function animateReels(dur) {
+            return new Promise(res => {
+                const start = Date.now();
                 const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
-                
-                const timer = setInterval(() => {
-                    reels.forEach(r => r.innerText = symbols[Math.floor(Math.random() * symbols.length)]);
-                    if (Date.now() - startTime >= duration) {
-                        clearInterval(timer);
-                        resolve();
-                    }
+                const t = setInterval(() => {
+                    reels.forEach(r => r.innerText = symbols[Math.floor(Math.random()*6)]);
+                    if (Date.now() - start >= dur) { clearInterval(t); res(); }
                 }, 50);
             });
         }
 
-        function toggleButtons(disabled) {
-            document.querySelectorAll('.spin-btn').forEach(btn => btn.disabled = disabled);
-        }
+        function toggleButtons(d) { document.querySelectorAll('.spin-btn').forEach(b => b.disabled = d); }
 
         function renderShop() {
             const grid = document.getElementById('shop-grid');
             grid.innerHTML = '';
-
             shopItems.forEach(item => {
                 const isOwned = inventory.includes(item.id);
                 const div = document.createElement('div');
-                div.className = `shop-item ${isOwned ? 'owned' : ''}`;
-                
+                div.className = `shop-item`;
+                div.style.border = isOwned ? `2px solid var(--accent-color)` : '2px solid transparent';
                 div.innerHTML = `
-                    <strong>${item.name}</strong>
-                    <span class="price-tag">${isOwned ? 'OWNED' : item.price + ' Tkn'}</span>
-                    <button onclick="${isOwned ? `applyTheme('${item.id}')` : `buyItem('${item.id}')`}" 
-                            style="font-size: 0.8rem; padding: 5px 10px; width: 100%;">
+                    <strong>${item.name}</strong><br>
+                    <span style="font-size: 0.8rem; color: var(--accent-color)">${isOwned ? 'OWNED' : item.price + ' Tkn'}</span><br>
+                    <button onclick="${isOwned ? `applyTheme('${item.id}')` : `buyItem('${item.id}')`}" style="font-size: 0.7rem; padding: 5px; width: 100%; margin-top:10px;">
                         ${isOwned ? 'Apply' : 'Buy'}
-                    </button>
-                `;
+                    </button>`;
                 grid.appendChild(div);
             });
         }
 
         function buyItem(id) {
             const item = shopItems.find(i => i.id === id);
-            if (tokens >= item.price) {
-                tokens -= item.price;
-                inventory.push(id);
-                document.getElementById('status-msg').innerText = `Unlocked ${item.name}!`;
-                updateUI();
-            } else {
-                document.getElementById('status-msg').innerText = "Insufficient tokens!";
-            }
+            if (tokens >= item.price) { tokens -= item.price; inventory.push(id); updateUI(); }
         }
 
         function applyTheme(id) {
@@ -306,7 +361,6 @@
             document.documentElement.style.setProperty('--bg-color', item.colors.bg);
             document.documentElement.style.setProperty('--panel-color', item.colors.panel);
             document.documentElement.style.setProperty('--accent-color', item.colors.accent);
-            document.getElementById('status-msg').innerText = `${item.name} theme active!`;
         }
 
         updateUI();
